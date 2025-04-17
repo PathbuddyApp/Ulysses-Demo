@@ -1,0 +1,5 @@
+streamlit>=1.25.0
+streamlit-drawable-canvas
+openai
+Pillow
+numpy
