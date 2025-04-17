@@ -28,27 +28,7 @@ def clean_latex_response(text):
 
 # Generate question
 def generate_problem(difficulty_level):
-    system = f"""
-You are Ulysses — a wise and thoughtful tutor in the tradition of the Oxford Tutorial and Harvard Case Method.
-
-Generate a creative, {difficulty_level}-difficulty math problem suitable for middle school students.
-
-Important: Every problem must use real-world or simulated scenarios that give meaning and context to the problem. Situate the math within relatable cases like shopping, sports, travel, environment, school life, technology, or any real-world situation relevant to young learners.
-
-The problem must come from one of these domains only:
-- Percentages
-- Data Tables
-- Statistical Graphs
-
-Your task:
-- Generate one problem based on a real-world or simulated scenario.
-- Include 4–5 multiple choice answer options.
-- Provide two distinct solution strategies that demonstrate different ways of thinking.
-
-Rules:
-- Never generate problems outside of percentages, data tables, or statistical graphs.
-- Avoid purely abstract or context-free problems.
-"""
+    system = st.secrets["PROMPT_SYSTEM_PROBLEM"].format(difficulty_level=difficulty_level)
     user = "Return as JSON with keys: question, choices (list), solution_method1, solution_method2, correct_answer."
 
     res = openai.ChatCompletion.create(
