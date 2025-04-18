@@ -14,6 +14,8 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.set_page_config(layout="wide")
 st.title("Ulysses")
+if "clear_canvas" not in st.session_state:
+    st.session_state.clear_canvas = False
 
 # 🎯 Difficulty dropdown
 st.sidebar.title("Choose Difficulty")
@@ -76,6 +78,9 @@ for i, opt in enumerate(q["choices"]):
 
 # Canvas for working
 st.subheader("📝 Show your working:")
+# 🧼 Determine whether to clear the canvas or reuse the last drawing
+initial_image = None if st.session_state.get("clear_canvas", False) else st.session_state.get("last_drawing", None)
+
 canvas_result = st_canvas(
     stroke_width=3,
     stroke_color="#000000",
@@ -84,8 +89,16 @@ canvas_result = st_canvas(
     height=600,
     width=800,
     drawing_mode="freedraw",
-    key="canvas"
+    key="canvas",
+    initial_drawing=initial_image
 )
+
+# 🧠 Save current drawing for possible reuse
+if canvas_result.image_data is not None:
+    st.session_state.last_drawing = canvas_result.image_data
+
+# 🔁 Reset the flag after using it
+st.session_state.clear_canvas = False 
 
 # Process submission
 if canvas_result.image_data is not None:
@@ -138,14 +151,17 @@ if st.session_state.feedback:
         with col1:
             if st.button("🔁 Try Again (Another Method)"):
                 st.session_state.feedback = None
+                st.session_state.clear_canvas = True  # 🧽 Clear canvas
                 st.rerun()
         with col2:
             if st.button("➡️ Next Question"):
                 st.session_state.problem = generate_problem(difficulty_map[difficulty])
                 st.session_state.feedback = None
                 st.session_state.correct = False
+                st.session_state.clear_canvas = True  # 🧽 Clear canvas
                 st.rerun()
     else:
         if st.button("🔄 Retry Your Answer"):
             st.session_state.feedback = None
+            st.session_state.clear_canvas = False  # 🛑 Keep existing drawing
             st.rerun()
