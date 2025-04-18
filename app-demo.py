@@ -15,6 +15,20 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 st.set_page_config(layout="wide")
 st.title("Ulysses")
 
+# Password gate
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    password = st.text_input("Enter password to access Ulysses:", type="password")
+
+    if password == st.secrets["APP_PASSWORD"]:
+        st.session_state.authenticated = True
+        st.experimental_rerun()
+    elif password:
+        st.error("Incorrect password.")
+    st.stop()
+
 # 🎯 Difficulty dropdown
 st.sidebar.title("Choose Difficulty")
 difficulty = st.sidebar.selectbox("Select level:", ["Easy 🟢", "Medium 🟡", "Hard 🔴"], index=1)
